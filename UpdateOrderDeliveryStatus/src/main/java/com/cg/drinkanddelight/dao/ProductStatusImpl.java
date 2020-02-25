@@ -1,35 +1,61 @@
 package com.cg.drinkanddelight.dao;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
 
-import com.cg.drinkanddelight.model.*;
+import com.cg.drinkanddelight.exception.Exception404;
+import com.cg.drinkanddelight.model.ProductBeans;
 
 public class ProductStatusImpl implements ProductInterfaces {
-	ProductBeans pb=new ProductBeans();
-	InputStreamReader isr=new InputStreamReader(System.in);
-	BufferedReader buff=new BufferedReader(isr);
+
+	public static HashMap<String, ProductBeans> hm= new HashMap<>();
 	
-	ProductStatusList ps=new ProductStatusList();
-	HashMap<String, String> hm1=ps.getData();
-	
-	public void productStatus(){ 
-	  try {
-		System.out.println("Enter the Product Order ID:");
-		pb.setPdtId(buff.readLine());
-		System.out.println("Enter the Product Delivery Status:");
-		pb.setPdtDs(buff.readLine());
-		hm1.replace(pb.getPdtId(),pb.getPdtDs());
-		}
-		catch(IOException e) {
-			System.out.println(e);
-		}
+	public ProductStatusImpl() {
+		setProductStatusList();
 	}
+	private void setProductStatusList() {
+		
+		ProductBeans p1=new ProductBeans("PDT1011","Accepted","Hair Oil");
+		ProductBeans p2=new ProductBeans("PDT1016","Pending","Pen");
+		ProductBeans p3=new ProductBeans("PDT1017","out for Delivery","Hair Oil");
+		ProductBeans p4=new ProductBeans("PDT1018","Accepted","Colgate");
+		ProductBeans p5=new ProductBeans("PDT1019","Accepted","Laptop");
+		ProductBeans p6=new ProductBeans("PDT1010","Accepted","Watch");
 	
-	public void showProductDetails() {
-		System.out.println("****Product Delivery Status*****");
-		hm1.entrySet().stream().forEach(e -> System.out.println("Product ID:"+ e.getKey()+" Delivery Status:"+e.getValue()));
+	    hm.put(p1.getPdtId(),p1);
+	    hm.put(p2.getPdtId(), p2);
+	    hm.put(p3.getPdtId(),p3);
+	    hm.put(p4.getPdtId(), p4);
+	    hm.put(p5.getPdtId(),p5);
+	    hm.put(p6.getPdtId(), p6);
+	   
+		
+	}
+
+	@Override
+	public HashMap<String, ProductBeans> getList() {
+	     return hm;
+	}
+	@Override
+	public void productUpdate(String productId, String status) throws Exception404 {
+		ProductBeans p=null;
+		
+		if(!hm.isEmpty()) {
+			for (Map.Entry<String, ProductBeans> entry : hm.entrySet()) {
+			    if(entry.getValue().getPdtId().equals(productId)) {
+			    	p=entry.getValue();
+			    	break;
+			    }
+			}
+		}
+			
+		if(p!=null) {
+				
+				hm.replace(p.getPdtId(),new ProductBeans(p.getPdtId(),status, p.getPdNmae()));
+				
+			}
+		
+
+		
 	}
 }

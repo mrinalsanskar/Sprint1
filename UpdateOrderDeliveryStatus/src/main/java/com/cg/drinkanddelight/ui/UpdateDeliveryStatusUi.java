@@ -6,10 +6,10 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import com.cg.drinkanddelight.dao.ProductStatusImpl;
-import com.cg.drinkanddelight.dao.ProductStatusList;
 import com.cg.drinkanddelight.dao.RawMaterialStatusImpl;
-import com.cg.drinkanddelight.dao.RawMaterialStatusList;
 import com.cg.drinkanddelight.exception.Exception404;
+import com.cg.drinkanddelight.model.ProductBeans;
+import com.cg.drinkanddelight.model.RawMaterialBeans;
 import com.cg.drinkanddelight.service.UpdateStatusServiceImpl;
 
 public class UpdateDeliveryStatusUi {
@@ -20,68 +20,78 @@ public class UpdateDeliveryStatusUi {
 	ProductStatusImpl p=new ProductStatusImpl();
 	
 	String opr;
-	int choice;
+	String choice;
+	String choice1;
 	String choice2;
 	
-	UpdateStatusServiceImpl obj=new UpdateStatusServiceImpl();
-	
-	
-	ProductStatusList ps=new ProductStatusList();
-	RawMaterialStatusList rms=new RawMaterialStatusList();
-	HashMap<String, String> hm2=ps.getData();
-	HashMap<String, String> hm3=rms.getData();
+	UpdateStatusServiceImpl obj;
 
 	public static void main(String[] args) {
 		UpdateDeliveryStatusUi exec=new UpdateDeliveryStatusUi();
 		exec.isr=new InputStreamReader(System.in);
         exec.buff=new BufferedReader(exec.isr);
+        exec.obj=new UpdateStatusServiceImpl();
         exec.ui();
 	}
 	
 	public void ui() {
 		try {
-			obj.displayAllProductStatus();
+			
+			showProductDetails(obj.displayAllProductStatus());
+			
 		} catch (Exception404 e1) {
 			System.out.println("An Exception Occured!!!!");
 		}
 		System.out.println("\n");
 		try {
-			obj.displayAllRawMaterialStatus();
+			showRawMaterialDetails(obj.displayAllRawMaterialStatus());
 		} catch (Exception404 e1) {
 			System.out.println("An Exception Occured!!!!");
 		}
 		System.out.println("\n");
 			    do {
 				System.out.println("******LET'S UPDATE THE ORDER DELIVERY STATUS******");
-				System.out.println("Select the category:\n 1. RAW MATERIALS\n 2. PRODUCTS\n 3. SHOW ALL UPDATE STATUS");
+				System.out.println("Select the category:\n 1. RAW MATERIALS\n 2. PRODUCTS\n 3. SHOW ALL UPDATE STATUS\n 4. Exit");
 				String str="Invalid Choice";
 				try {
-				choice=Integer.parseInt(buff.readLine());
+				choice=buff.readLine();
 				}
 				catch(IOException e) {
 					System.out.println(e);
 				}
 				switch(choice) {
-					case 1: r.rawMaterialStatus();
+					case "1": updateRawMaterialStatus();
 					        break;
-					case 2: p.productStatus();
+					case "2": 
+							updateProductStatus();
 					        break;
-					case 3: System.out.println("1. OF RAW MATERIALS\n 2. OF PRODUCTS");
-					       int choice1=0;
+					case "3": System.out.println("1. OF RAW MATERIALS\n 2. OF PRODUCTS");
 					       try {
-						         choice1=Integer.parseInt(buff.readLine());
+						         choice1=buff.readLine();
 						    }
 						   catch(IOException e) {
 							        System.out.println(e);
 						     }
 					       switch(choice1) {
-					       case 1: r.showRawMaterialDetails();
+					       case "1": try {
+								showRawMaterialDetails(obj.displayAllRawMaterialStatus());
+							} catch (Exception404 e1) {
+								
+								System.out.println(e1);
+							}
 					               break;
-					       case 2: p.showProductDetails();
+					       case "2": try {
+								showProductDetails(obj.displayAllProductStatus());
+							} catch (Exception404 e1) {
+								
+								System.out.println(e1);
+							}
 					               break;
 					       default: System.out.println(str); 
 					       }
 					       break;
+			     case "4": System.exit(0);
+			               break;
 					default: System.out.println(str);
 				}
 				System.out.println("Do you want to continue?(y/n)");
@@ -92,5 +102,44 @@ public class UpdateDeliveryStatusUi {
 			        System.out.println(e);
 		     }
 				}while(opr.equalsIgnoreCase("y"));
+	}
+
+	public void showProductDetails(HashMap<String,ProductBeans> hm) {
+		System.out.println("****Product Delivery Status*****");
+		hm.entrySet().stream().forEach(e -> System.out.println("Product Name:"+e.getValue().getPdNmae()+" Product ID:"+ e.getValue().getPdtId()+" Delivery Status:"+e.getValue().getPdtDs()));
+	}
+	
+	private void showRawMaterialDetails(HashMap<String, RawMaterialBeans> hm1) {
+		System.out.println("****Raw Material Delivery Status*****");
+		hm1.entrySet().stream().forEach(e -> System.out.println("Raw Material Name:"+e.getValue().getRmName()+" Raw Material ID:"+ e.getValue().getRmId()+" Delivery Status:"+e.getValue().getRmDs()));
+		
+	}
+
+	private void updateProductStatus() {
+		
+		try {
+			System.out.println("Enter the Product Order ID:");
+			 String productId=buff.readLine();
+			System.out.println("Enter the Product Delivery Status:");
+			String status=buff.readLine();
+			obj.productStatusUpdate(productId, status);
+			}
+			catch(IOException e) {
+				System.out.println(e);
+			}
+	}
+	
+private void updateRawMaterialStatus() {
+		
+		try {
+			System.out.println("Enter the Raw Material Order ID:");
+			 String rmId=buff.readLine();
+			System.out.println("Enter the Raw Material Delivery Status:");
+			String status=buff.readLine();
+			obj.rawMaterialUpdate(rmId, status);
+			}
+			catch(IOException e) {
+				System.out.println(e);
+			}
 	}
 }
